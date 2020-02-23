@@ -42,13 +42,13 @@ const paneGrid = new Tweakpane({
 paneGrid.addSeparator();
 paneGrid.addInput(PARAMS, 'gridWidth', {
 	min: 512,
-	max: 1024,
+	max: 2048,
 	label: 'Grid width'
 });
 paneGrid.addSeparator();
 paneGrid.addInput(PARAMS, 'gridHeight', {
 	min: 512,
-	max: 1024,
+	max: 2048,
 	label: 'Grid height'
 });
 paneGrid.addSeparator();
