@@ -5,11 +5,13 @@ LZRBIT is a drawing-app designed to create web-art using the BBC Microbit microc
 Pieces of Art are created by using the microbit accelerometer BLE service - Bluetooth Low Energy- paired with the browser.
 
 # TRY IY ONLINE HERE
-https://youthful-kepler-96ccd7.netlify.com/
+https://lzrbit3.netlify.com/
 
 ![LZRBIT-PORTADA](https://user-images.githubusercontent.com/17754060/74114515-8a7fa000-4b78-11ea-803d-82d5e218ddd3.png)
 
 ## How to use the LZRBIT?
+
+**[|| Get a BBC Microbit ||](https://www.microbit.org/)**
 
 **1. Use ONLY with Google Chrome.**
 
@@ -19,7 +21,7 @@ https://youthful-kepler-96ccd7.netlify.com/
 
 **4. The microbit ‘flat’ on one of both hands aligns to (x=0, y=0).**
 
-**5. Use the CONTROLS PANEL at the top of the canvas to modify variables.**
+**5. Use the SCALE GRID at the top left of the canvas to modify the grid width and height parameters.**
 
 **6. Press the POINT checkbox to draw points, and adjust its parameters.**
 
@@ -27,11 +29,13 @@ https://youthful-kepler-96ccd7.netlify.com/
 
 **8. Use the microbit x,y,z axis to draw on the canvas by rotating them.**
 
-**9. Use the ‘SAVE’ button to save your design.**
+**9. Use the RESET button to reset your design.**
 
-**10. Uncheck both, POINT and LINE, to reset the screen to the starting position.**
+**10. Use the SAVE button to save your design.**
 
-https://youthful-kepler-96ccd7.netlify.com/
+**11. For more information please visit: [bernatferragut.com](http://bernatferragut.com/)**
+
+https://lzrbit3.netlify.com/
 
 ![UX-4](https://user-images.githubusercontent.com/17754060/74108499-f2b68d80-4b48-11ea-945a-b34cff667043.png)
 
