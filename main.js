@@ -2,19 +2,19 @@ console.log('1.js-connected');
 
 //////////////// FIREBASE //////////////
 // Your web app's Firebase configuration
-let firebaseConfig = {
-	apiKey: "AIzaSyBEjTnvCCkM4bRr73PJrCbC3HQ46p6cK5I",
-    authDomain: "lzrbit-db.firebaseapp.com",
-    databaseURL: "https://lzrbit-db.firebaseio.com",
-    projectId: "lzrbit-db",
-    storageBucket: "lzrbit-db.appspot.com",
-    messagingSenderId: "488933348339",
-    appId: "1:488933348339:web:eb448d3c1c2d26b3973886",
-    measurementId: "G-TBC5QYT0H4"
-};
-  // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-let firestore = firebase.firestore();
+// let firebaseConfig = {
+// 	apiKey: "AIzaSyBEjTnvCCkM4bRr73PJrCbC3HQ46p6cK5I",
+//     authDomain: "lzrbit-db.firebaseapp.com",
+//     databaseURL: "https://lzrbit-db.firebaseio.com",
+//     projectId: "lzrbit-db",
+//     storageBucket: "lzrbit-db.appspot.com",
+//     messagingSenderId: "488933348339",
+//     appId: "1:488933348339:web:eb448d3c1c2d26b3973886",
+//     measurementId: "G-TBC5QYT0H4"
+// };
+// Initialize Firebase
+// firebase.initializeApp(firebaseConfig);
+// let firestore = firebase.firestore();
 //////////////// FIREBASE //////////////
 
 //////////////// CONTROL PARAMS ///////////
@@ -30,28 +30,33 @@ let PARAMS = {
 	erase: false,
 	gridWidth: 1024,
 	gridHeight: 1024,
+	curve : false,
+	curveWidth : 0.1,
+	curveColor : '#9acd32',
+	counter : 0,
+	pointsList : []
 };
 //////////////// CONTROL PARAMS ///////////
 
 //////////////// TWEAKPANE ////////////////
 // TWEAKPANE - INPUT - GRID
-const paneGrid = new Tweakpane({
-	container: document.getElementById('grid'),
-	title: 'SCALE GRID',
-});
-paneGrid.addSeparator();
-paneGrid.addInput(PARAMS, 'gridWidth', {
-	min: 512,
-	max: 2048,
-	label: 'Grid width'
-});
-paneGrid.addSeparator();
-paneGrid.addInput(PARAMS, 'gridHeight', {
-	min: 512,
-	max: 2048,
-	label: 'Grid height'
-});
-paneGrid.addSeparator();
+// const paneGrid = new Tweakpane({
+// 	container: document.getElementById('grid'),
+// 	title: 'SCALE GRID',
+// });
+// paneGrid.addSeparator();
+// paneGrid.addInput(PARAMS, 'gridWidth', {
+// 	min: 512,
+// 	max: 1024,
+// 	label: 'Grid width'
+// });
+// paneGrid.addSeparator();
+// paneGrid.addInput(PARAMS, 'gridHeight', {
+// 	min: 512,
+// 	max: 1024,
+// 	label: 'Grid height'
+// });
+// paneGrid.addSeparator();
 
 // TWEAKPANE - INPUT - DOT
 const paneDot = new Tweakpane({
@@ -60,7 +65,7 @@ const paneDot = new Tweakpane({
 });
 paneDot.addInput(PARAMS, 'dot', { label: 'Dot on/off' });
 paneDot.addInput(PARAMS, 'dotWidth', {
-	min: 0,
+	min: 0.1,
 	max: 3,
 	label: 'Dot width'
 });
@@ -86,6 +91,24 @@ paneLine.addInput(PARAMS, 'lineColor', { label: 'Line color' });
 // panelLine - CHANGES
 paneLine.on('change', (value) => {
 	console.log('line: ', value);
+});
+
+// TWEAKPANE - INPUT - CURVE
+const paneCurve = new Tweakpane({
+	container: document.getElementById('curve'),
+	title: 'CURVE PARAMETERS',
+});
+// console.log(curveLine);
+paneCurve.addInput(PARAMS, 'curve', { label: 'Curve on/off' });
+paneCurve.addInput(PARAMS, 'curveWidth', {
+	min: 0,
+	max: 3,
+	label: 'Curve width'
+});
+paneCurve.addInput(PARAMS, 'curveColor', { label: 'Curve color' });
+// panelLine - CHANGES
+paneCurve.on('change', (value) => {
+	console.log('curve: ', value);
 });
 
 // TWEAKPANE - MONITOR - GYROSCOPE
@@ -127,13 +150,13 @@ paneGyro
 });
 
 // paneGyro - CHANGES FROM FIREBASE
-let docRef = firestore.doc("gyroApp/data");
-docRef.onSnapshot((doc)=> {
-	const myData = doc.data();
-	console.log( `dot:${myData.dot} dotWidth:${myData.dotWidth} dotColor:${myData.dotColor}`);
-	console.log( `x:${myData.x} y:${myData.y} z:${myData.z} `);
-	console.log( `line:${myData.dot} lineWidth:${myData.lineWidth} lineColor:${myData.lineColor}`);
-})
+// let docRef = firestore.doc("gyroApp/data");
+// docRef.onSnapshot((doc)=> {
+// 	const myData = doc.data();
+// 	console.log( `dot:${myData.dot} dotWidth:${myData.dotWidth} dotColor:${myData.dotColor}`);
+// 	console.log( `x:${myData.x} y:${myData.y} z:${myData.z} `);
+// 	console.log( `line:${myData.dot} lineWidth:${myData.lineWidth} lineColor:${myData.lineColor}`);
+// })
 //////////////// TWEAKPANE ////////////////
 
 //////////////// MICROBIT PAIRING /////////
@@ -176,7 +199,6 @@ let frame, mx, my;
 let pointer = new Brush(ctx1,ctx2);
 ////////////// DOWNLOAD IMAGE PREP.//////////////
 
-
 // Animation will be done on the TOP layer ( 2 Canvas )
 (function loop() {
 	// LZR add composite filter
@@ -190,21 +212,35 @@ let pointer = new Brush(ctx1,ctx2);
 		// Drawing dots and lines in ctx1
 		if (PARAMS.dot === true) {
 			// Drawing Dot
-			mx = brush.mapValues(PARAMS.x, -PARAMS.gridWidth, PARAMS.gridWidth, 0, w);
-			my = brush.mapValues(PARAMS.y, -PARAMS.gridHeight, PARAMS.gridHeight, 0, h);
+			// mx = brush.mapValues(PARAMS.x, -PARAMS.gridWidth, PARAMS.gridWidth, 0, w);
+			// my = brush.mapValues(PARAMS.y, -PARAMS.gridHeight, PARAMS.gridHeight, 0, h);
 			brush.drawDot(mx, my, PARAMS.dotWidth, PARAMS.dotColor);
-
-			// dot drawing
 		}
+		// Drawing lines and lines in ctx1
 		if (PARAMS.line === true) {
 			// Drawing Line
-			mx = brush.mapValues(PARAMS.x, -PARAMS.gridWidth, PARAMS.gridWidth, 0, w);
-			my = brush.mapValues(PARAMS.y, -PARAMS.gridHeight, PARAMS.gridHeight, 0, h);
+			// mx = brush.mapValues(PARAMS.x, -PARAMS.gridWidth, PARAMS.gridWidth, 0, w);
+			// my = brush.mapValues(PARAMS.y, -PARAMS.gridHeight, PARAMS.gridHeight, 0, h);
 			brush.drawLine(mx, my, PARAMS.lineWidth, PARAMS.lineColor);
-			// allows to start path from here without jumping
-			// ctx.beginPath();
 		} 
-
+		// Drawing curves and lines in ctx1
+		if (PARAMS.curve === true) {
+			// Drawing Curve
+			// mx = brush.mapValues(PARAMS.x, -PARAMS.gridWidth, PARAMS.gridWidth, 0, w);
+			// my = brush.mapValues(PARAMS.y, -PARAMS.gridHeight, PARAMS.gridHeight, 0, h);
+			brush.drawCurve(mx, my, PARAMS.curveWidth, PARAMS.curveColor, PARAMS.counter, PARAMS.pointsList);
+			// Adding points
+			PARAMS.pointsList.push([mx,my]);
+			// Adding counter
+			PARAMS.counter++;
+			// console.log(`counter: ${PARAMS.counter} PointList: ${PARAMS.pointsList}`);
+			// Erasing counter and points
+			if(PARAMS.counter > 2) {
+				PARAMS.counter = 0;
+				PARAMS.pointsList = [];
+			}			
+		}
+		// Eraind all in ctx1
 		if (PARAMS.erase === true) {
 			ctx1.clearRect(0, 0, w, h);
 			PARAMS.erase = false;
@@ -235,28 +271,28 @@ function saveDrawing() {
 	a.click();
 	// document.body.removeChild(a);
 	////////////// FIREBASE UPLOAD IMAGE //////////////
-	// image BLOB
-	let imgData = dataURLtoBlob(a.href);
-	// Image NAME + Unique ID number
-	let imgName = `galaxy:${uuidv4()}`;
-	// Upload image to FIREBASE
-	let storageRef = firebase.storage().ref(`images/${imgName}`);
-	// Upload image to selected storage reference
-	let uploadTask = storageRef.put(imgData);
-	uploadTask.on('state_changed', (snapshot)=> {
-		// observe state chenge events such as progress, pause, resume
-		// get task progress by including the number of bytes uploaded and total number of bytes
-		let progress = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
-		console.log(`upload progress: ${progress} done`);
-	}, function(error){
-		console.log(error.message);
-	}, function(){
-		// handle successful uploads on complete
-		uploadTask.snapshot.ref.getDownloadURL().then( (downloadURL)=> {
-			// get your upload image URL here..p5.BandPass()
-			console.log(downloadURL);
-		})
-	})
+	// // image BLOB
+	// let imgData = dataURLtoBlob(a.href);
+	// // Image NAME + Unique ID number
+	// let imgName = `galaxy:${uuidv4()}`;
+	// // Upload image to FIREBASE
+	// let storageRef = firebase.storage().ref(`images/${imgName}`);
+	// // Upload image to selected storage reference
+	// let uploadTask = storageRef.put(imgData);
+	// uploadTask.on('state_changed', (snapshot)=> {
+	// 	// observe state chenge events such as progress, pause, resume
+	// 	// get task progress by including the number of bytes uploaded and total number of bytes
+	// 	let progress = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
+	// 	console.log(`upload progress: ${progress} done`);
+	// }, function(error){
+	// 	console.log(error.message);
+	// }, function(){
+	// 	// handle successful uploads on complete
+	// 	uploadTask.snapshot.ref.getDownloadURL().then( (downloadURL)=> {
+	// 		// get your upload image URL here..p5.BandPass()
+	// 		console.log(downloadURL);
+	// 	})
+	// })
 }
 
 //**dataURL to blob */
